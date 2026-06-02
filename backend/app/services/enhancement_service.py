@@ -1,3 +1,4 @@
+import os
 import shutil
 import site
 import sys
@@ -20,6 +21,7 @@ _ESRGAN_SCALE = 4
 _ESRGAN_TILE_SIZE = 256
 _ESRGAN_TILE_PAD = 24
 _CUDA_AVAILABLE: bool | None = None
+_DEFAULT_ESRGAN_FILENAME = "RealESRGAN_x4plus.materialized.pth"
 
 
 def is_blurry(image_path: str | Path, threshold: float | None = None) -> tuple[bool, float]:
@@ -55,7 +57,7 @@ def materialize_realesrgan_checkpoint() -> Path | None:
     archive_dir = source / "archive"
     data_pkl = archive_dir / "data.pkl"
     if not data_pkl.exists():
-        return None
+        return _download_realesrgan_checkpoint(source)
 
     target = settings.materialized_esrgan_path
     if target.exists() and target.stat().st_size > 0 and target.stat().st_mtime >= data_pkl.stat().st_mtime:
@@ -67,6 +69,33 @@ def materialize_realesrgan_checkpoint() -> Path | None:
             if path.is_file():
                 zf.write(path, Path("archive") / path.relative_to(archive_dir))
     return target
+
+
+def _hf_realesrgan_repo_id(source: Path) -> str | None:
+    repo_id = os.getenv("REALESRGAN_REPO_ID", "").strip()
+    if repo_id:
+        return repo_id
+
+    source_ref = source.as_posix().strip("/")
+    if not source.exists() and source_ref.count("/") == 1 and not source_ref.startswith("."):
+        return source_ref
+    return None
+
+
+def _download_realesrgan_checkpoint(source: Path) -> Path | None:
+    repo_id = _hf_realesrgan_repo_id(source)
+    if not repo_id:
+        return None
+
+    filename = os.getenv("REALESRGAN_FILENAME", _DEFAULT_ESRGAN_FILENAME).strip() or _DEFAULT_ESRGAN_FILENAME
+    token = os.getenv("HF_TOKEN") or os.getenv("HUGGINGFACE_HUB_TOKEN") or None
+
+    try:
+        from huggingface_hub import hf_hub_download
+    except ImportError as exc:
+        raise RuntimeError("huggingface_hub is required to download the Real-ESRGAN checkpoint from Hugging Face.") from exc
+
+    return Path(hf_hub_download(repo_id=repo_id, filename=filename, token=token))
 
 
 def _cuda_available() -> bool:
