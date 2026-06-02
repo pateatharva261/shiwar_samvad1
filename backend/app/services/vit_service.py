@@ -1,0 +1,88 @@
+from pathlib import Path
+import sys
+
+from backend.app.core.config import get_settings
+
+
+class ViTWeedDetector:
+    def __init__(self) -> None:
+        self.settings = get_settings()
+        self.model = None
+        self.processor = None
+        self.device = None
+        self._torch = None
+        self._functional = None
+
+    def load(self) -> None:
+        if self.model is not None and self.processor is not None:
+            return
+        if self.settings.ml_site_packages and self.settings.ml_site_packages.exists():
+            ml_path = str(self.settings.ml_site_packages)
+            if ml_path not in sys.path:
+                sys.path.insert(0, ml_path)
+        import torch
+        import torch.nn.functional as F
+        from transformers import ViTForImageClassification, ViTImageProcessor
+
+        self._torch = torch
+        self._functional = F
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        model_dir = Path(self.settings.vit_model_dir)
+        if not model_dir.exists():
+            raise FileNotFoundError(f"ViT model directory not found: {model_dir}")
+        self.processor = ViTImageProcessor.from_pretrained(model_dir)
+        self.model = ViTForImageClassification.from_pretrained(model_dir)
+        self.model.to(self.device)
+        self.model.eval()
+
+    def predict(self, image_path: str | Path) -> dict:
+        self.load()
+        assert self.model is not None
+        assert self.processor is not None
+        assert self._torch is not None
+        assert self._functional is not None
+        from PIL import Image
+
+        image = Image.open(image_path).convert("RGB")
+        inputs = self.processor(images=image, return_tensors="pt")
+        inputs = {key: value.to(self.device) for key, value in inputs.items()}
+
+        with self._torch.no_grad():
+            logits = self.model(**inputs).logits
+            probabilities = self._functional.softmax(logits, dim=-1).squeeze(0)
+
+        predicted_id = int(probabilities.argmax(dim=-1).item())
+        confidence = float(probabilities[predicted_id].item())
+        predicted_class = self.model.config.id2label[predicted_id]
+        top_predictions = []
+        top_values, top_ids = self._torch.topk(probabilities, k=min(3, probabilities.shape[0]))
+        for score, class_id in zip(top_values.tolist(), top_ids.tolist(), strict=False):
+            top_predictions.append(
+                {
+                    "label": self.model.config.id2label[int(class_id)],
+                    "confidence": round(float(score), 4),
+                }
+            )
+
+        is_non_weed = predicted_class.lower() == "non-weed"
+        if is_non_weed:
+            status = "non_weed"
+        elif confidence < self.settings.confidence_threshold:
+            status = "low_confidence"
+        else:
+            status = "weed_detected"
+
+        return {
+            "predicted_class": predicted_class,
+            "confidence": round(confidence, 4),
+            "confidence_percent": round(confidence * 100, 2),
+            "status": status,
+            "is_non_weed": is_non_weed,
+            "top_predictions": top_predictions,
+            "device": str(self.device),
+            "model_dir": str(self.settings.vit_model_dir),
+            "threshold": self.settings.confidence_threshold,
+        }
+
+
+vit_detector = ViTWeedDetector()
