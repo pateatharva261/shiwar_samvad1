@@ -31,6 +31,8 @@ class ViTWeedDetector:
         pretrained_kwargs = {}
         if self.settings.huggingface_token:
             pretrained_kwargs["token"] = self.settings.huggingface_token
+        if self.settings.vit_model_ref and self.settings.vit_model_subfolder:
+            pretrained_kwargs["subfolder"] = self.settings.vit_model_subfolder
         self.processor = ViTImageProcessor.from_pretrained(model_ref, **pretrained_kwargs)
         self.model = ViTForImageClassification.from_pretrained(model_ref, **pretrained_kwargs)
         self.model.to(self.device)
@@ -82,6 +84,7 @@ class ViTWeedDetector:
             "top_predictions": top_predictions,
             "device": str(self.device),
             "model_ref": self.settings.vit_model_ref or str(self.settings.vit_model_dir),
+            "model_subfolder": self.settings.vit_model_subfolder,
             "threshold": self.settings.confidence_threshold,
         }
 

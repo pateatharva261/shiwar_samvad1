@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     groq_model: str = "llama-3.3-70b-versatile"
 
     vit_model_ref: str | None = None
+    vit_model_subfolder: str = ""
     vit_model_dir: Path = Path("checkpoints/vit-coco-weed")
     huggingface_token: str = ""
     ml_site_packages: Path | None = None
