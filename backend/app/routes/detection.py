@@ -1,4 +1,5 @@
 from pathlib import Path
+import logging
 from uuid import uuid4
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
@@ -12,6 +13,7 @@ from backend.app.services.vit_service import vit_detector
 
 
 router = APIRouter(prefix="/vision", tags=["Weed Detection"])
+logger = logging.getLogger(__name__)
 
 
 async def _save_upload(file: UploadFile) -> Path:
@@ -107,6 +109,7 @@ async def predict(file: UploadFile = File(...)):
     try:
         prediction = await run_in_threadpool(vit_detector.predict, prediction_path)
     except Exception as exc:
+        logger.exception("Prediction failed for image %s", prediction_path)
         raise HTTPException(status_code=500, detail=f"Prediction failed: {exc}") from exc
 
     recommendation = get_herbicide_details(prediction["predicted_class"])
