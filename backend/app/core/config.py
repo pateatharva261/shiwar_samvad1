@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     vit_model_subfolder: str = ""
     vit_model_dir: Path = Path("checkpoints/vit-coco-weed")
     huggingface_token: str = ""
+    hf_token: str = ""
     ml_site_packages: Path | None = None
     confidence_threshold: float = 0.0
     blur_threshold: float = 100.0

@@ -29,8 +29,9 @@ class ViTWeedDetector:
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         model_ref = self.settings.vit_model_ref or str(self.settings.vit_model_dir)
         pretrained_kwargs = {}
-        if self.settings.huggingface_token:
-            pretrained_kwargs["token"] = self.settings.huggingface_token
+        hf_token = self.settings.huggingface_token or self.settings.hf_token
+        if hf_token:
+            pretrained_kwargs["token"] = hf_token
         if self.settings.vit_model_ref and self.settings.vit_model_subfolder:
             pretrained_kwargs["subfolder"] = self.settings.vit_model_subfolder
         self.processor = ViTImageProcessor.from_pretrained(model_ref, **pretrained_kwargs)
