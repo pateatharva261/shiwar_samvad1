@@ -27,11 +27,9 @@ class ViTWeedDetector:
         self._torch = torch
         self._functional = F
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        model_dir = Path(self.settings.vit_model_dir)
-        if not model_dir.exists():
-            raise FileNotFoundError(f"ViT model directory not found: {model_dir}")
-        self.processor = ViTImageProcessor.from_pretrained(model_dir)
-        self.model = ViTForImageClassification.from_pretrained(model_dir)
+        model_ref = str(self.settings.vit_model_dir)
+        self.processor = ViTImageProcessor.from_pretrained(model_ref)
+        self.model = ViTForImageClassification.from_pretrained(model_ref)
         self.model.to(self.device)
         self.model.eval()
 
