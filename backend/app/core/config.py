@@ -23,6 +23,7 @@ class Settings(BaseSettings):
 
     vit_model_ref: str | None = None
     vit_model_subfolder: str = ""
+    vit_predict_url: str = ""
     vit_model_dir: Path = Path("checkpoints/vit-coco-weed")
     huggingface_token: str = ""
     hf_token: str = ""

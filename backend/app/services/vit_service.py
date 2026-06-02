@@ -13,6 +13,28 @@ class ViTWeedDetector:
         self._torch = None
         self._functional = None
 
+    def predict_remote(self, image_path: str | Path) -> dict:
+        if self.settings.vit_predict_url.rstrip("/").endswith("/predict"):
+            import requests
+
+            image_path = Path(image_path)
+            with image_path.open("rb") as image_file:
+                response = requests.post(
+                    self.settings.vit_predict_url,
+                    files={"file": (image_path.name, image_file, "application/octet-stream")},
+                    timeout=180,
+                )
+            response.raise_for_status()
+            return response.json()
+
+        from gradio_client import Client, handle_file
+
+        client = Client(self.settings.vit_predict_url)
+        result = client.predict(handle_file(str(image_path)), api_name="/predict")
+        if not isinstance(result, dict):
+            raise ValueError(f"Unexpected remote prediction response: {result!r}")
+        return result
+
     def load(self) -> None:
         if self.model is not None and self.processor is not None:
             return
@@ -40,6 +62,9 @@ class ViTWeedDetector:
         self.model.eval()
 
     def predict(self, image_path: str | Path) -> dict:
+        if self.settings.vit_predict_url:
+            return self.predict_remote(image_path)
+
         self.load()
         assert self.model is not None
         assert self.processor is not None
