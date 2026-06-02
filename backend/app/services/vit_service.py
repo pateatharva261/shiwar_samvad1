@@ -27,9 +27,12 @@ class ViTWeedDetector:
         self._torch = torch
         self._functional = F
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        model_ref = str(self.settings.vit_model_dir)
-        self.processor = ViTImageProcessor.from_pretrained(model_ref)
-        self.model = ViTForImageClassification.from_pretrained(model_ref)
+        model_ref = self.settings.vit_model_ref or str(self.settings.vit_model_dir)
+        pretrained_kwargs = {}
+        if self.settings.huggingface_token:
+            pretrained_kwargs["token"] = self.settings.huggingface_token
+        self.processor = ViTImageProcessor.from_pretrained(model_ref, **pretrained_kwargs)
+        self.model = ViTForImageClassification.from_pretrained(model_ref, **pretrained_kwargs)
         self.model.to(self.device)
         self.model.eval()
 
@@ -78,7 +81,7 @@ class ViTWeedDetector:
             "is_non_weed": is_non_weed,
             "top_predictions": top_predictions,
             "device": str(self.device),
-            "model_dir": str(self.settings.vit_model_dir),
+            "model_ref": self.settings.vit_model_ref or str(self.settings.vit_model_dir),
             "threshold": self.settings.confidence_threshold,
         }
 
