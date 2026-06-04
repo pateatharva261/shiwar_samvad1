@@ -1,4 +1,4 @@
-# 🌾 Species-Specific Weed Detection and Intelligent Herbicide Recommendation using Deep Learning, Generative AI, and Agentic Decision Support
+# 🌾 AI-Powered Weed Detection & Herbicide Recommendation System
 
 ## 📖 Project Description
 
@@ -20,7 +20,7 @@ This project is an AI-powered precision agriculture platform that helps farmers 
 
 **Frontend**: React 19 • Vite • React Router • Tailwind CSS • Framer Motion • Axios • Context API
 
-**AI Models**: Vision Transformer (ViT) • ResNet • Real-ESRGAN 
+**AI Models**: Vision Transformer (ViT) • ResNet • Real-ESRGAN • GAN/Diffusion Models
 
 ## 📊 Model Performance
 
@@ -131,6 +131,7 @@ shiwar_samvad1-main/
 │
 ├── .gitignore                         # Git ignore patterns
 └── README.md                          # Project documentation
+```
 
 ## 📦 Models on Hugging Face
 
@@ -151,7 +152,6 @@ All AI models are hosted on Hugging Face Hub due to GitHub's file size limitatio
 - **Application**: Pre-processing before weed classification
 
 > 💡 **Note**: Models are automatically downloaded from Hugging Face Hub when the backend starts for the first time.
-```
 
 ## 🚀 Quick Start 
 
