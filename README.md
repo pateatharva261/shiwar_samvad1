@@ -20,7 +20,7 @@ This project is an AI-powered precision agriculture platform that helps farmers 
 
 **Frontend**: React 19 • Vite • React Router • Tailwind CSS • Framer Motion • Axios • Context API
 
-**AI Models**: Vision Transformer (ViT) • ResNet • Real-ESRGAN • GAN/Diffusion Models
+**AI Models**: Vision Transformer (ViT) • ResNet • Real-ESRGAN 
 
 ## 📊 Model Performance
 
@@ -63,47 +63,97 @@ The model is trained to detect **9 weed species** commonly found in agricultural
 ## 📁 Project Structure
 
 ```
-shiwar_samvad1/
+shiwar_samvad1-main/
 │
-├── backend/                    # FastAPI Backend
+├── backend/                           # FastAPI Backend
 │   ├── app/
-│   │   ├── routes/            # API endpoints
-│   │   ├── models/            # Database models
-│   │   ├── services/          # Business logic
-│   │   └── utils/             # Helper functions
-│   ├── main.py                # Application entry point
-│   ├── requirements.txt       # Python dependencies
-│   └── .env                   # Environment variables
+│   │   ├── core/                     # Core configurations
+│   │   │   ├── config.py            # Application settings
+│   │   │   └── __init__.py
+│   │   ├── models/                   # MongoDB models
+│   │   │   └── __init__.py
+│   │   ├── routes/                   # API endpoints
+│   │   │   ├── auth_routes.py       # Authentication endpoints
+│   │   │   ├── detection_routes.py  # Weed detection endpoints
+│   │   │   ├── chatbot_routes.py    # AI chatbot endpoints
+│   │   │   ├── calculator_routes.py # Dosage calculator
+│   │   │   └── __init__.py
+│   │   ├── services/                 # Business logic layer
+│   │   │   ├── vit_service.py       # ViT model inference
+│   │   │   ├── enhancement_service.py # Image enhancement (Real-ESRGAN)
+│   │   │   ├── herbicide_service.py  # Recommendation engine
+│   │   │   ├── chatbot_service.py    # Groq AI integration
+│   │   │   ├── calculator_service.py # Dosage calculations
+│   │   │   └── __init__.py
+│   │   ├── utils/                    # Helper utilities
+│   │   │   └── __init__.py
+│   │   ├── database.py              # MongoDB connection
+│   │   ├── schemas.py               # Pydantic schemas
+│   │   └── __init__.py
+│   ├── main.py                       # FastAPI application entry
+│   ├── requirements.txt              # Python dependencies
+│   ├── .env.example                  # Environment template
+│   └── __init__.py
 │
-├── frontend/                   # React Frontend
+├── frontend/                          # React 19 + Vite Frontend
 │   ├── src/
-│   │   ├── components/        # React components
-│   │   ├── pages/             # Page components
-│   │   ├── context/           # State management
-│   │   ├── services/          # API integration
-│   │   └── App.jsx            # Root component
-│   ├── package.json           # Node dependencies
-│   └── .env                   # Environment variables
+│   │   ├── assets/                   # Static assets (images, icons)
+│   │   ├── components/               # Reusable React components
+│   │   │   ├── Navbar.jsx
+│   │   │   ├── Footer.jsx
+│   │   │   ├── DetectionCard.jsx
+│   │   │   └── ...
+│   │   ├── context/                  # React Context API
+│   │   │   └── AuthContext.jsx
+│   │   ├── pages/                    # Page components
+│   │   │   ├── Home.jsx
+│   │   │   ├── Detection.jsx
+│   │   │   ├── Calculator.jsx
+│   │   │   ├── Chatbot.jsx
+│   │   │   ├── History.jsx
+│   │   │   └── ...
+│   │   ├── services/                 # API service layer
+│   │   │   └── api.js
+│   │   ├── App.jsx                   # Root component
+│   │   ├── main.jsx                  # Application entry
+│   │   └── styles.css                # Tailwind CSS
+│   ├── index.html                    # HTML template
+│   ├── package.json                  # Node dependencies
+│   ├── vite.config.js                # Vite configuration
+│   ├── tailwind.config.js            # Tailwind CSS config
+│   ├── postcss.config.js             # PostCSS config
+│   └── .env.example                  # Environment template
 │
-├── artifacts/                  # Model artifacts
-│   ├── *.pt                   # PyTorch models
-│   ├── *.keras                # Keras models
-│   ├── history.json           # Training history
-│   └── label_map.json         # Class mappings
+├── hf_space/                          # Hugging Face Space deployment
+│   └── gradio_vit/                   # Gradio demo app
+│       ├── app.py                    # Gradio interface
+│       └── requirements.txt          # Python dependencies
 │
-├── checkpoints/                # Model checkpoints
-│   └── vit-coco-weed/         # ViT fine-tuned weights
-│
-├── Deepweeds(Data)/           # Training dataset (not in repo)
-├── Non Weed Dataset/          # Augmentation data (not in repo)
-│
-├── train_model.py             # Model training script
-├── train_vit_coco_weighted.py # ViT training with class weights
-├── .gitignore                 # Git ignore patterns
-└── README.md                  # Project documentation
+├── .gitignore                         # Git ignore patterns
+└── README.md                          # Project documentation
+
+## 📦 Models on Hugging Face
+
+All AI models are hosted on Hugging Face Hub due to GitHub's file size limitations:
+
+### 🤖 Vision Transformer (ViT) - Weed Classification
+- **Repository**: [`Atharva2023254/vit_coco_weed`](https://huggingface.co/Atharva2023254/vit_coco_weed)
+- **Base Model**: `google/vit-base-patch16-224`
+- **Fine-tuned on**: DeepWeeds dataset (17,509 images)
+- **Classes**: 9 (8 weed species + non-weed)
+- **Accuracy**: 95.13%
+- **Input**: 224×224 RGB images
+
+### 🔍 Real-ESRGAN - Image Enhancement
+- **Repository**: [`Atharva2023254/realesgran`](https://huggingface.co/Atharva2023254/realesgran)
+- **Model**: RealESRGAN_x4plus
+- **Purpose**: Super-resolution and blur correction
+- **Application**: Pre-processing before weed classification
+
+> 💡 **Note**: Models are automatically downloaded from Hugging Face Hub when the backend starts for the first time.
 ```
 
-## 🚀 Quick Start (Windows)
+## 🚀 Quick Start 
 
 ### Frontend Setup
 
@@ -125,38 +175,17 @@ uvicorn main:app --reload
 ```
 ___
 
-## 🤖 AI Models
+## 🔗 Important Links
 
-### Vision Transformer (ViT)
+**🌐 Live Demo**: https://shiwar-samvad1.vercel.app
 
-- **Model**: `google/vit-base-patch16-224`
-- **Fine-tuning**: DeepWeeds dataset (17,509 images)
-- **Classes**: 9 (8 weed species + non-weed)
-- **Input Size**: 224×224 RGB
-- **Framework**: PyTorch + Hugging Face Transformers
-- **Hosted**: https://huggingface.co/Atharva2023254/vit_coco_weed
+**🤗 Hugging Face Models**: https://huggingface.co/Atharva2023254
 
-### Real-ESRGAN
+**📊 Dataset**: https://drive.google.com/drive/folders/1q0KnjmySuEkj2uppKZevigVl9_Stucca
 
-- **Purpose**: Image super-resolution and enhancement
-- **Model**: RealESRGAN_x4plus
-- **Application**: Blur correction before classification
-- **Framework**: PyTorch
-- **Hosted**: https://huggingface.co/Atharva2023254/realesgran
-
-> **Note**: Models exceed GitHub's 100MB limit and are hosted on HuggingFace Hub
-
-## 🔗 Links
-
-**Live Demo**: https://shiwar-samvad1.vercel.app
-
-
-
-**Models**: https://huggingface.co/Atharva2023254
-
-**Deployment**:
+**☁️ Deployment**:
 - Frontend: Vercel
 - Backend: Render
 - Database: MongoDB Atlas
 
-**Data Source**: https://drive.google.com/drive/folders/1q0KnjmySuEkj2uppKZevigVl9_Stucca?usp=sharing
+
