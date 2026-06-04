@@ -2,8 +2,7 @@
 
 ## 📖 Project Description
 
-This project is an AI-powered precision agriculture platform that helps farmers identify weed species from uploaded images and receive intelligent herbicide recommendations. The system uses deep learning, computer vision, generative AI, and agentic decision support to reduce herbicide overuse, improve crop safety, and support sustainable farming practices.
-
+Shiwar Samvad is an AI-powered precision agriculture platform that helps farmers identify weed species from field images and receive intelligent, species-specific herbicide recommendations. The system leverages Vision Transformer (ViT) for accurate weed classification and integrates Real-ESRGAN for enhancing low-quality or blurry images before prediction. By combining deep learning, generative AI, and decision-support capabilities, the platform promotes sustainable farming practices, reduces unnecessary herbicide usage, and improves crop safety.
 ## ✨ Features
 
 - **Weed Detection** - ViT model trained on DeepWeeds (9 classes, 17K+ images)
@@ -38,7 +37,7 @@ The fine-tuned Vision Transformer significantly outperforms the ResNet-50 baseli
 
 | Method | Silhouette Score |
 |--------|------------------|
-| K-Means (K = 3) | 0.01563 |
+| K-Means (K = 9) | 0.01563 |
 | Agglomerative | 0.00390 |
 | DBSCAN | Single cluster found |
 
