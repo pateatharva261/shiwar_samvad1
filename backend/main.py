@@ -5,8 +5,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from backend.app.core.config import get_settings
-
-
 from backend.app.database import repository
 from backend.app.routes import auth, chatbot, contact, detection, recommendations
 
@@ -16,20 +14,30 @@ async def lifespan(app: FastAPI):
     settings = get_settings()
     settings.upload_dir.mkdir(parents=True, exist_ok=True)
     settings.enhanced_dir.mkdir(parents=True, exist_ok=True)
+
     try:
         await repository.connect()
         app.state.mongodb_ready = True
+        app.state.mongodb_error = ""
     except Exception as exc:
         app.state.mongodb_ready = False
         app.state.mongodb_error = str(exc)
+
     yield
+
     await repository.close()
 
 
 settings = get_settings()
+
 settings.upload_dir.mkdir(parents=True, exist_ok=True)
 settings.enhanced_dir.mkdir(parents=True, exist_ok=True)
-app = FastAPI(title=settings.app_name, version="1.0.0", lifespan=lifespan)
+
+app = FastAPI(
+    title=settings.app_name,
+    version="1.0.0",
+    lifespan=lifespan
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -39,8 +47,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/uploads", StaticFiles(directory=str(settings.upload_dir)), name="uploads")
+app.mount(
+    "/uploads",
+    StaticFiles(directory=str(settings.upload_dir)),
+    name="uploads"
+)
 
+# Include routers
 app.include_router(auth.router, prefix=settings.api_prefix)
 app.include_router(detection.router, prefix=settings.api_prefix)
 app.include_router(recommendations.router, prefix=settings.api_prefix)
@@ -48,12 +61,18 @@ app.include_router(chatbot.router, prefix=settings.api_prefix)
 app.include_router(contact.router, prefix=settings.api_prefix)
 
 
-@app.get("/")
+# Root endpoint (supports GET and HEAD)
+@app.api_route("/", methods=["GET", "HEAD"])
 async def root():
-    return {"name": "Shiwar Samvad", "status": "running", "mongodb_ready": getattr(app.state, "mongodb_ready", False)}
+    return {
+        "name": "Shiwar Samvad",
+        "status": "running",
+        "mongodb_ready": getattr(app.state, "mongodb_ready", False)
+    }
 
 
-@app.get("/health")
+# Health check endpoint (supports GET and HEAD)
+@app.api_route("/health", methods=["GET", "HEAD"])
 async def health():
     return {
         "status": "ok",
