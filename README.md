@@ -1,10 +1,8 @@
-# 🌾 Shiwar Samvad - AI-Powered Weed Detection & Herbicide Recommendation
+# 🌾 Species-Specific Weed Detection and Intelligent Herbicide Recommendation using Deep Learning, Generative AI, and Agentic Decision Support
 
-> Precision agriculture platform using Vision Transformers, Real-ESRGAN, and Agentic AI for species-specific weed detection and intelligent herbicide recommendations.
+## 📖 Project Description
 
-## 🌟 Overview
-
-AI-powered precision agriculture platform addressing herbicide overuse in farming. Uses Vision Transformers (ViT), Real-ESRGAN, and Generative AI to identify weed species, recommend targeted herbicides, calculate dosages, and estimate costs—promoting sustainable farming practices.
+This project is an AI-powered precision agriculture platform that helps farmers identify weed species from uploaded images and receive intelligent herbicide recommendations. The system uses deep learning, computer vision, generative AI, and agentic decision support to reduce herbicide overuse, improve crop safety, and support sustainable farming practices.
 
 ## ✨ Features
 
@@ -136,7 +134,7 @@ ___
 - **Classes**: 9 (8 weed species + non-weed)
 - **Input Size**: 224×224 RGB
 - **Framework**: PyTorch + Hugging Face Transformers
-- **Hosted**: [HuggingFace - vit_coco_weed](https://huggingface.co/Atharva2023254/vit_coco_weed)
+- **Hosted**: https://huggingface.co/Atharva2023254/vit_coco_weed
 
 ### Real-ESRGAN
 
@@ -144,7 +142,7 @@ ___
 - **Model**: RealESRGAN_x4plus
 - **Application**: Blur correction before classification
 - **Framework**: PyTorch
-- **Hosted**: [HuggingFace - realesgran](https://huggingface.co/Atharva2023254/realesgran)
+- **Hosted**: https://huggingface.co/Atharva2023254/realesgran
 
 > **Note**: Models exceed GitHub's 100MB limit and are hosted on HuggingFace Hub
 
@@ -152,13 +150,13 @@ ___
 
 **Live Demo**: https://shiwar-samvad1.vercel.app
 
-**API**: https://shiwar-samvad1.onrender.com
+
 
 **Models**: https://huggingface.co/Atharva2023254
 
 **Deployment**:
- Frontend:Vercel 
- Backend:Render 
- Database:MongoDB Atlas
+- Frontend: Vercel
+- Backend: Render
+- Database: MongoDB Atlas
 
 **Data Source**: https://drive.google.com/drive/folders/1q0KnjmySuEkj2uppKZevigVl9_Stucca?usp=sharing
