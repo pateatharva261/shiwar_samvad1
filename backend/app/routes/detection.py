@@ -106,11 +106,38 @@ async def predict(file: UploadFile = File(...)):
             "enhanced_blur_score": round(enhanced_score, 2),
         }
 
-    try:
-        prediction = await run_in_threadpool(vit_detector.predict, prediction_path)
-    except Exception as exc:
-        logger.exception("Prediction failed for image %s", prediction_path)
-        raise HTTPException(status_code=500, detail=f"Prediction failed: {exc}") from exc
+    import httpx
+
+try:
+
+    prediction = await run_in_threadpool(
+        vit_detector.predict,
+        prediction_path,
+    )
+
+except httpx.ReadTimeout:
+
+    logger.exception("HF Space timeout")
+
+    raise HTTPException(
+
+        status_code=504,
+
+        detail="Prediction server timeout. Please try again.",
+
+    )
+
+except Exception as exc:
+
+    logger.exception(exc)
+
+    raise HTTPException(
+
+        status_code=500,
+
+        detail=str(exc),
+
+    ) from exc
 
     recommendation = get_herbicide_details(prediction["predicted_class"])
     return {
